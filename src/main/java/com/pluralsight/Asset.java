@@ -4,9 +4,9 @@ import java.math.BigDecimal;
 
 public abstract class Asset {
 
-    private String description;
-    private String dateAcquired;
-    private BigDecimal originalCost;
+    protected String description;
+    protected String dateAcquired;
+    protected BigDecimal originalCost;
 
     public Asset(BigDecimal originalCost, String dateAcquired, String description) {
         this.originalCost = originalCost;
@@ -38,7 +38,7 @@ public abstract class Asset {
         this.originalCost = originalCost;
     }
 
-    private BigDecimal getValue(){
+    public BigDecimal getValue(){
         return originalCost;
     }
 

@@ -1,6 +1,9 @@
 package com.pluralsight;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 public class Vehicle extends Asset {
@@ -39,38 +42,38 @@ public class Vehicle extends Asset {
         this.odometer = odometer;
     }
 
-    public BigDecimal getValue(int initialCost, int yearHad, int mileage, String makeModel){
-        String lowerMakeModel = makeModel.toLowerCase();
-        BigDecimal finalCost = null;
-        if (yearHad <= 3){
-             finalCost = initialCost * Math.pow(1 - 0.03);
-            if (mileage > 100000 && !lowerMakeModel.contains("honda") && !lowerMakeModel.contains("toyaota")){
-                finalCost *= 0.75;
-            }
-            System.out.println(finalCost);
-        } else if (yearHad > 3 && yearHad <= 6 ){
-             finalCost = initialCost * Math.pow(1 - 0.06);
-            if (mileage > 100000 && !lowerMakeModel.contains("honda") && !lowerMakeModel.contains("toyaota")){
-                finalCost *= 0.75;
-            }
-            System.out.println(finalCost);
-        } else if (yearHad > 6 && yearHad <= 10 ){
-             finalCost = initialCost * Math.pow(1 - 0.08);
-            if (mileage > 100000 && !lowerMakeModel.contains("honda") && !lowerMakeModel.contains("toyaota")){
-                finalCost *= 0.75;
-            }
-            System.out.println(finalCost);
-        } else if (yearHad > 10){
-             finalCost = BigDecimal.valueOf(1000.00);
-            if (mileage > 100000 && !lowerMakeModel.contains("honda") && !lowerMakeModel.contains("toyaota")){
-                finalCost *= 0.75;
-                System.out.println(finalCost);
-            }
+    public int getAge() {
+       int age = LocalDate.now().getYear() - year;
+        return age;
+    }
 
+    public BigDecimal getValue() {
+        int age = getAge();
+        BigDecimal value;
+
+        if (age > 10) {
+            value = new BigDecimal("1000.00");
+        } else {
+            double ratePerYear;
+            if (age <= 3) {
+                ratePerYear = 0.03;
+            } else if (age <= 6) {
+                ratePerYear = 0.06;
+            } else {
+                ratePerYear = 0.08;
+            }
+            BigDecimal multiplier = BigDecimal.valueOf(1 - (ratePerYear * age));
+            value = getOriginalCost().multiply(multiplier);
         }
 
+        String lower = makeModel.toLowerCase();
+        boolean isHondaOrToyota = lower.contains("honda") || lower.contains("toyota");
 
-        return finalCost ;
+        if (odometer > 100000 && !isHondaOrToyota) {
+            value = value.multiply(new BigDecimal("0.75"));
+        }
 
+        return value.setScale(2, RoundingMode.HALF_UP);
     }
+
 }
